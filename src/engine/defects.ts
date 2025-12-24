@@ -371,6 +371,360 @@ export const DEFECT_DATABASE: Record<DefectType, DefectInfo> = {
       'Some roughness may be acceptable depending on application',
     ],
   },
+
+  gauge_bands: {
+    name: 'Gauge Bands',
+    description:
+      'Periodic thickness variations appearing as visible bands or rings around the film circumference. Often creates roll hardness variations.',
+    causes: [
+      {
+        cause: 'Air ring instability',
+        probability: 'high',
+        adjustments: [
+          'Check air ring for vibration or flutter',
+          'Verify blower output is steady',
+          'Inspect air ring for damage or blockage',
+        ],
+        explanation:
+          'Pulsating air flow causes cyclical cooling variations that create bands.',
+      },
+      {
+        cause: 'Extruder output surging',
+        probability: 'high',
+        adjustments: [
+          'Check screw speed consistency',
+          'Verify feed consistency (no bridging)',
+          'Inspect screw and barrel for wear',
+        ],
+        explanation:
+          'Variations in melt delivery create periodic thickness changes.',
+      },
+      {
+        cause: 'Die bolt pattern interference',
+        probability: 'medium',
+        adjustments: [
+          'Check die bolt torque uniformity',
+          'Verify die is not warped',
+          'Consider thermal bolt adjustments',
+        ],
+        explanation:
+          'Die bolts can create local flow restrictions that cause repeating patterns.',
+      },
+      {
+        cause: 'Haul-off speed variation',
+        probability: 'medium',
+        adjustments: [
+          'Check nip roll drive for consistency',
+          'Verify encoder/tachometer operation',
+          'Inspect rolls for damage or buildup',
+        ],
+        explanation:
+          'Speed variations in takeoff create periodic gauge changes.',
+      },
+    ],
+    generalRecommendations: [
+      'Gauge bands often have mechanical origin - check rotating equipment',
+      'Oscillating haul-off can mask minor banding',
+      'Frequency analysis can help identify the source',
+    ],
+  },
+
+  wrinkles: {
+    name: 'Wrinkles',
+    description:
+      'Film surface exhibits creases or folds, often appearing after collapsing frame or at winder. Affects roll quality and downstream converting.',
+    causes: [
+      {
+        cause: 'Uneven film tension',
+        probability: 'high',
+        adjustments: [
+          'Balance collapsing frame geometry',
+          'Check guide roll alignment',
+          'Verify uniform nip pressure across width',
+        ],
+        explanation:
+          'Tension differences across the web cause material to bunch up.',
+      },
+      {
+        cause: 'Gauge variation',
+        probability: 'high',
+        adjustments: [
+          'Improve gauge uniformity (see gauge control)',
+          'Balance air ring cooling',
+          'Adjust die gap as needed',
+        ],
+        explanation:
+          'Thick and thin areas travel at different effective speeds, creating wrinkles.',
+      },
+      {
+        cause: 'Collapsing frame issues',
+        probability: 'medium',
+        adjustments: [
+          'Verify frame angle is appropriate',
+          'Check for worn or damaged guide boards',
+          'Ensure bubble is centered in frame',
+        ],
+        explanation:
+          'Poor bubble collapse geometry causes uneven layflat.',
+      },
+      {
+        cause: 'Static electricity',
+        probability: 'low',
+        adjustments: [
+          'Install static elimination equipment',
+          'Increase ambient humidity if possible',
+          'Ground all equipment properly',
+        ],
+        explanation:
+          'Static can cause film layers to attract/repel unpredictably.',
+      },
+    ],
+    generalRecommendations: [
+      'Wrinkles often originate at the collapsing frame',
+      'Check all roller alignments in film path',
+      'Proper winder tension control is essential',
+    ],
+  },
+
+  blocking: {
+    name: 'Blocking',
+    description:
+      'Film layers stick together on the roll, making unwinding difficult or causing film damage. Common issue with certain additives or storage conditions.',
+    causes: [
+      {
+        cause: 'Insufficient antiblock additive',
+        probability: 'high',
+        adjustments: [
+          'Increase antiblock concentration (0.1-0.3% typical)',
+          'Verify additive is properly dispersed',
+          'Consider different antiblock type (silica vs talc)',
+        ],
+        explanation:
+          'Antiblock creates micro-roughness that prevents intimate layer contact.',
+      },
+      {
+        cause: 'Excessive winding tension',
+        probability: 'high',
+        adjustments: [
+          'Reduce winder tension 10-20%',
+          'Use taper tension profile (decreasing toward core)',
+          'Avoid over-tight rolls',
+        ],
+        explanation:
+          'High pressure between layers promotes blocking.',
+      },
+      {
+        cause: 'Film too warm at winder',
+        probability: 'medium',
+        adjustments: [
+          'Increase cooling before winder',
+          'Reduce line speed if needed',
+          'Add cooling rolls if available',
+        ],
+        explanation:
+          'Warm film is softer and more prone to blocking.',
+      },
+      {
+        cause: 'Storage conditions',
+        probability: 'medium',
+        adjustments: [
+          'Store rolls at lower temperature',
+          'Avoid stacking heavy rolls',
+          'Allow rolls to age before shipping',
+        ],
+        explanation:
+          'Heat and pressure during storage worsen blocking over time.',
+      },
+    ],
+    generalRecommendations: [
+      'Blocking often develops during storage, not immediately',
+      'Test blocking resistance after 24-48 hours',
+      'Slip additives can worsen blocking - balance carefully',
+    ],
+  },
+
+  gels: {
+    name: 'Gels',
+    description:
+      'Small, hard particles visible in the film, appearing as specs or fish-eyes. Can be crosslinked polymer, contamination, or undispersed additives.',
+    causes: [
+      {
+        cause: 'Degraded material in system',
+        probability: 'high',
+        adjustments: [
+          'Purge extruder thoroughly',
+          'Check for dead spots in flow path',
+          'Reduce residence time if possible',
+        ],
+        explanation:
+          'Material that sits too long at temperature can crosslink and form gels.',
+      },
+      {
+        cause: 'Contamination',
+        probability: 'high',
+        adjustments: [
+          'Inspect raw material for contamination',
+          'Clean hopper and feed system',
+          'Check regrind quality and cleanliness',
+        ],
+        explanation:
+          'Foreign material or degraded regrind creates visible defects.',
+      },
+      {
+        cause: 'Screen pack breakthrough',
+        probability: 'medium',
+        adjustments: [
+          'Replace screen pack',
+          'Use finer mesh screens',
+          'Verify breaker plate condition',
+        ],
+        explanation:
+          'Damaged screens allow gels to pass through.',
+      },
+      {
+        cause: 'Additive dispersion issues',
+        probability: 'medium',
+        adjustments: [
+          'Use pre-compounded materials',
+          'Verify masterbatch let-down ratio',
+          'Increase mixing (screw design or speed)',
+        ],
+        explanation:
+          'Undispersed additives can appear as gel-like defects.',
+      },
+    ],
+    generalRecommendations: [
+      'Gels are often "built up" over time - regular purging helps',
+      'Fine screen packs (150+ mesh) catch most gels',
+      'Reduce barrel temperatures if degradation suspected',
+    ],
+  },
+
+  poor_clarity: {
+    name: 'Poor Clarity',
+    description:
+      'Film appears hazy, cloudy, or has reduced transparency. Affects appearance and may indicate processing issues.',
+    causes: [
+      {
+        cause: 'Excessive crystallinity',
+        probability: 'high',
+        adjustments: [
+          'Increase cooling rate (raise frost line)',
+          'Reduce melt temperature slightly',
+          'Increase quench air velocity',
+        ],
+        explanation:
+          'Large crystals scatter light and reduce clarity. Fast cooling creates smaller crystals.',
+      },
+      {
+        cause: 'Surface roughness',
+        probability: 'high',
+        adjustments: [
+          'Increase melt/die temperature',
+          'Optimize frost line height',
+          'Reduce cooling rate initially',
+        ],
+        explanation:
+          'Rough surfaces scatter light and appear hazy.',
+      },
+      {
+        cause: 'Additive bloom',
+        probability: 'medium',
+        adjustments: [
+          'Reduce slip/antiblock levels',
+          'Change additive types',
+          'Adjust processing temperatures',
+        ],
+        explanation:
+          'Additives migrating to surface create haze.',
+      },
+      {
+        cause: 'Moisture in material',
+        probability: 'medium',
+        adjustments: [
+          'Dry material properly',
+          'Check hopper dryer operation',
+          'Verify material storage conditions',
+        ],
+        explanation:
+          'Water vapor creates micro-voids that scatter light.',
+      },
+    ],
+    generalRecommendations: [
+      'Clarity is very material-dependent - LDPE typically best',
+      'HDPE inherently more hazy due to higher crystallinity',
+      'Balance clarity against other properties (stiffness, strength)',
+    ],
+  },
+
+  bubble_instability: {
+    name: 'Bubble Instability',
+    description:
+      'Bubble oscillates, breathes, or moves erratically. Can be helical (corkscrew), draw resonance, or random motion. Causes gauge variation and production issues.',
+    causes: [
+      {
+        cause: 'Melt temperature variation',
+        probability: 'high',
+        adjustments: [
+          'Stabilize barrel temperatures',
+          'Check for screw/barrel wear',
+          'Verify consistent material feed',
+        ],
+        explanation:
+          'Temperature changes affect melt viscosity and bubble strength.',
+      },
+      {
+        cause: 'Air ring imbalance',
+        probability: 'high',
+        adjustments: [
+          'Level air ring precisely',
+          'Balance air flow around circumference',
+          'Check for blocked or damaged ports',
+        ],
+        explanation:
+          'Uneven cooling causes asymmetric forces on the bubble.',
+      },
+      {
+        cause: 'Inadequate melt strength',
+        probability: 'medium',
+        adjustments: [
+          'Reduce melt temperature',
+          'Decrease output rate',
+          'Consider different resin grade',
+        ],
+        explanation:
+          'Weak melt cannot support the bubble weight and internal pressure.',
+      },
+      {
+        cause: 'Draft or air currents',
+        probability: 'medium',
+        adjustments: [
+          'Shield bubble from drafts',
+          'Install bubble cage if needed',
+          'Check building HVAC systems',
+        ],
+        explanation:
+          'External air movement disturbs the delicate bubble equilibrium.',
+      },
+      {
+        cause: 'Improper BUR or frost line',
+        probability: 'medium',
+        adjustments: [
+          'Adjust blow-up ratio',
+          'Modify frost line height',
+          'Balance cooling with output rate',
+        ],
+        explanation:
+          'Wrong BUR or frost line position can cause natural instability modes.',
+      },
+    ],
+    generalRecommendations: [
+      'Draw resonance often occurs at specific output rates - adjust slightly',
+      'Helical instability usually air ring related',
+      'IBC can help stabilize large or thin-gauge bubbles',
+      'Consistent melt pressure is key to stable operation',
+    ],
+  },
 };
 
 export function getDefectInfo(defect: DefectType): DefectInfo {

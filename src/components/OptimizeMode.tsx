@@ -199,6 +199,154 @@ function ResultsDisplay({ results, material }: { results: RecommendedSettings; m
         </div>
       </div>
 
+      {/* Frost Line Height */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+          <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+          </svg>
+          Frost Line Height
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-slate-50 rounded-lg p-4">
+            <div className="text-sm text-slate-600">Recommended Height</div>
+            <div className="text-lg font-semibold text-slate-800">{results.frostLine.heightRange}</div>
+          </div>
+          <div className="bg-slate-50 rounded-lg p-4">
+            <div className="text-sm text-slate-600">Material Note</div>
+            <div className="text-sm text-slate-700">{results.frostLine.notes}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Nip Roller Settings */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+          <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Nip Roller Settings
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-slate-50 rounded-lg p-4">
+            <div className="text-sm text-slate-600">Speed</div>
+            <div className="text-sm font-semibold text-slate-800">{results.nipRollers.speed}</div>
+          </div>
+          <div className="bg-slate-50 rounded-lg p-4">
+            <div className="text-sm text-slate-600">Pressure</div>
+            <div className="text-sm font-semibold text-slate-800">{results.nipRollers.pressure}</div>
+          </div>
+          <div className="bg-slate-50 rounded-lg p-4">
+            <div className="text-sm text-slate-600">Temperature</div>
+            <div className="text-sm font-semibold text-slate-800">{results.nipRollers.temperature}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* IBC Settings */}
+      <div className={`rounded-lg shadow-md p-6 ${results.ibc.recommended ? 'bg-white' : 'bg-slate-50'}`}>
+        <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+          <svg className="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          Internal Bubble Cooling (IBC)
+          {results.ibc.recommended && (
+            <span className="ml-2 px-2 py-1 bg-teal-100 text-teal-800 text-xs font-medium rounded-full">
+              Recommended
+            </span>
+          )}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white rounded-lg p-4 border border-slate-200">
+            <div className="text-sm text-slate-600">Air Flow</div>
+            <div className="text-sm font-semibold text-slate-800">{results.ibc.airFlow}</div>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-slate-200">
+            <div className="text-sm text-slate-600">Notes</div>
+            <div className="text-sm text-slate-700">{results.ibc.notes}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Gauge Control */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+          <svg className="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Gauge Control
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="bg-slate-50 rounded-lg p-4">
+            <div className="text-sm text-slate-600">Target Variation</div>
+            <div className="text-lg font-semibold text-slate-800">{results.gaugeControl.targetVariation}</div>
+          </div>
+          <div className="bg-slate-50 rounded-lg p-4">
+            <div className="text-sm text-slate-600">Estimated Die Gap</div>
+            <div className="text-lg font-semibold text-slate-800">{results.gaugeControl.dieGapSetting}</div>
+          </div>
+        </div>
+        <ul className="space-y-1">
+          {results.gaugeControl.recommendations.map((rec, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+              <span className="text-indigo-500 mt-0.5">•</span>
+              {rec}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Bubble Stability */}
+      <div className={`rounded-lg shadow-md p-6 ${
+        results.bubbleStability.rating === 'stable' ? 'bg-green-50 border border-green-200' :
+        results.bubbleStability.rating === 'moderate' ? 'bg-yellow-50 border border-yellow-200' :
+        'bg-red-50 border border-red-200'
+      }`}>
+        <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
+          results.bubbleStability.rating === 'stable' ? 'text-green-800' :
+          results.bubbleStability.rating === 'moderate' ? 'text-yellow-800' :
+          'text-red-800'
+        }`}>
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Bubble Stability Assessment
+          <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-full capitalize ${
+            results.bubbleStability.rating === 'stable' ? 'bg-green-100 text-green-800' :
+            results.bubbleStability.rating === 'moderate' ? 'bg-yellow-100 text-yellow-800' :
+            'bg-red-100 text-red-800'
+          }`}>
+            {results.bubbleStability.rating}
+          </span>
+        </h3>
+        {results.bubbleStability.factors.length > 0 && (
+          <div className="mb-4">
+            <div className="text-sm font-medium text-slate-700 mb-2">Factors:</div>
+            <ul className="space-y-1">
+              {results.bubbleStability.factors.map((factor, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                  <span className="text-slate-400 mt-0.5">•</span>
+                  {factor}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {results.bubbleStability.recommendations.length > 0 && (
+          <div>
+            <div className="text-sm font-medium text-slate-700 mb-2">Recommendations:</div>
+            <ul className="space-y-1">
+              {results.bubbleStability.recommendations.map((rec, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                  <span className="text-green-500 mt-0.5">→</span>
+                  {rec}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
       {/* Critical Parameters */}
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-amber-800 mb-3 flex items-center gap-2">

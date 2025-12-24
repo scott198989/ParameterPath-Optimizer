@@ -7,7 +7,13 @@ export type DefectType =
   | 'voids_bubbles'
   | 'warping'
   | 'inconsistent_wall_thickness'
-  | 'surface_roughness';
+  | 'surface_roughness'
+  | 'gauge_bands'
+  | 'wrinkles'
+  | 'blocking'
+  | 'gels'
+  | 'poor_clarity'
+  | 'bubble_instability';
 
 export interface BarrelTemperatures {
   feed: { min: number; max: number; recommended: number };
@@ -52,6 +58,31 @@ export interface RecommendedSettings {
     coolingCapacity: string;
   };
   blowUpRatio: number;
+  frostLine: {
+    heightRange: string;
+    heightInches: { min: number; max: number };
+    notes: string;
+  };
+  nipRollers: {
+    speed: string;
+    pressure: string;
+    temperature: string;
+  };
+  ibc: {
+    recommended: boolean;
+    airFlow: string;
+    notes: string;
+  };
+  gaugeControl: {
+    targetVariation: string;
+    dieGapSetting: string;
+    recommendations: string[];
+  };
+  bubbleStability: {
+    rating: 'stable' | 'moderate' | 'challenging';
+    factors: string[];
+    recommendations: string[];
+  };
   confidence: 'high' | 'medium' | 'low';
   notes: string[];
   criticalParameters: string[];

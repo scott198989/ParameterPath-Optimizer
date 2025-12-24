@@ -21,27 +21,19 @@ function getMaterialDensity(material: MaterialType): number {
   return densities[material];
 }
 
+// Get die size based on target OD
+function getDieSize(targetOD: number): number {
+  if (targetOD <= 10) return 4;
+  if (targetOD <= 20) return 6;
+  if (targetOD <= 35) return 8;
+  if (targetOD <= 50) return 10;
+  return 12;
+}
+
 // Calculate optimal blow-up ratio based on OD and die diameter
 function calculateBUR(targetOD: number, material: MaterialType): number {
   const materialProps = getMaterial(material);
-  // Assume typical die diameters based on target OD
-  // BUR = bubble diameter / die diameter
-  // Typical die sizes: 4", 6", 8", 10", 12" etc.
-
-  // Select die size based on target OD
-  let dieSize: number;
-  if (targetOD <= 10) {
-    dieSize = 4;
-  } else if (targetOD <= 20) {
-    dieSize = 6;
-  } else if (targetOD <= 35) {
-    dieSize = 8;
-  } else if (targetOD <= 50) {
-    dieSize = 10;
-  } else {
-    dieSize = 12;
-  }
-
+  const dieSize = getDieSize(targetOD);
   const calculatedBUR = targetOD / dieSize;
 
   // Clamp to material's acceptable range
@@ -140,8 +132,6 @@ function calculateAirRing(
   material: MaterialType,
   od: number
 ): { lipGap: string; airVelocity: string; coolingCapacity: string } {
-  // These are qualitative recommendations
-
   let lipGap: string;
   let airVelocity: string;
   let coolingCapacity: string;
@@ -175,6 +165,221 @@ function calculateAirRing(
   }
 
   return { lipGap, airVelocity, coolingCapacity };
+}
+
+// Calculate frost line height recommendations
+function calculateFrostLine(
+  targetOD: number,
+  material: MaterialType,
+  productionRate: number
+): { heightRange: string; heightInches: { min: number; max: number }; notes: string } {
+  const materialProps = getMaterial(material);
+  const dieSize = getDieSize(targetOD);
+
+  // Frost line height typically 3-6x die diameter
+  // Adjusted by material factor and production rate
+  const baseFactor = materialProps.frostLineHeightFactor;
+  const rateAdjustment = productionRate > 300 ? 1.1 : productionRate < 100 ? 0.9 : 1.0;
+
+  const minHeight = Math.round(dieSize * 3 * baseFactor * rateAdjustment);
+  const maxHeight = Math.round(dieSize * 6 * baseFactor * rateAdjustment);
+  const optimalHeight = Math.round(dieSize * 4.5 * baseFactor * rateAdjustment);
+
+  let notes: string;
+  if (material === 'HDPE') {
+    notes = 'HDPE requires higher frost line for proper crystallinity development';
+  } else if (material === 'EVOH') {
+    notes = 'EVOH sensitive to frost line - maintain consistent height for barrier properties';
+  } else if (material === 'LLDPE') {
+    notes = 'LLDPE tolerates wider frost line range than HDPE';
+  } else {
+    notes = 'LDPE very forgiving - frost line height less critical';
+  }
+
+  return {
+    heightRange: `${minHeight}-${maxHeight}" (optimal: ~${optimalHeight}")`,
+    heightInches: { min: minHeight, max: maxHeight },
+    notes,
+  };
+}
+
+// Calculate nip roller settings
+function calculateNipRollers(
+  lineSpeed: { min: number; max: number; recommended: number },
+  gauge: number,
+  material: MaterialType
+): { speed: string; pressure: string; temperature: string } {
+  // Nip roller speed matches line speed (with slight tension adjustment)
+  const speedNote = `Match line speed (${lineSpeed.recommended} ft/min) with 1-3% draw`;
+
+  // Pressure based on gauge and material
+  let pressure: string;
+  if (gauge < 1) {
+    pressure = 'Light (15-25 PSI) - thin gauge sensitive to crushing';
+  } else if (gauge < 3) {
+    pressure = 'Medium (25-40 PSI) - standard operating range';
+  } else {
+    pressure = 'Medium-High (35-50 PSI) - heavier gauge needs more nip force';
+  }
+
+  // Temperature based on material
+  let temperature: string;
+  if (material === 'HDPE') {
+    temperature = 'Ambient to 80°F - avoid heating crystalline film';
+  } else if (material === 'EVOH') {
+    temperature = 'Ambient (60-75°F) - prevent moisture pickup';
+  } else {
+    temperature = 'Ambient to 100°F - slight warming can improve layflat';
+  }
+
+  return { speed: speedNote, pressure, temperature };
+}
+
+// Calculate IBC (Internal Bubble Cooling) recommendations
+function calculateIBC(
+  productionRate: number,
+  targetOD: number,
+  gauge: number,
+  material: MaterialType
+): { recommended: boolean; airFlow: string; notes: string } {
+  const coolingLoad = productionRate * targetOD;
+  const isHeavyGauge = gauge > 3;
+  const isHighOutput = productionRate > 250;
+
+  // IBC recommended for high cooling loads or specific conditions
+  const recommended = coolingLoad > 4000 || (isHeavyGauge && isHighOutput);
+
+  let airFlow: string;
+  let notes: string;
+
+  if (!recommended) {
+    airFlow = 'Not required for this application';
+    notes = 'External air ring cooling sufficient for current parameters';
+  } else if (material === 'HDPE') {
+    airFlow = 'High flow rate (match or exceed external cooling)';
+    notes = 'HDPE benefits significantly from IBC - improves output capacity 20-40%';
+  } else if (material === 'EVOH') {
+    airFlow = 'Moderate flow - balanced with external cooling';
+    notes = 'IBC helps maintain uniform cooling for consistent barrier properties';
+  } else {
+    airFlow = 'Medium-High flow rate';
+    notes = 'IBC enables higher output rates and improved gauge uniformity';
+  }
+
+  return { recommended, airFlow, notes };
+}
+
+// Calculate gauge control recommendations
+function calculateGaugeControl(
+  gauge: number,
+  targetOD: number,
+  material: MaterialType
+): { targetVariation: string; dieGapSetting: string; recommendations: string[] } {
+  const dieSize = getDieSize(targetOD);
+
+  // Target variation based on gauge
+  let targetVariation: string;
+  if (gauge < 1) {
+    targetVariation = '±5% (tight control required for thin gauge)';
+  } else if (gauge < 3) {
+    targetVariation = '±5-7% (standard tolerance)';
+  } else {
+    targetVariation = '±7-10% (relaxed tolerance acceptable)';
+  }
+
+  // Die gap setting (roughly 10-20x final gauge for typical BUR)
+  const estimatedDieGap = gauge * 15; // mils
+  const dieGapSetting = `~${estimatedDieGap.toFixed(0)} mils (${(estimatedDieGap / 1000).toFixed(3)}")`;
+
+  const recommendations: string[] = [
+    'Measure gauge at minimum 8 points around circumference',
+    'Use automatic gauge control (AGC) if available',
+    `Verify die gap uniformity (target ±0.001" on ${dieSize}" die)`,
+  ];
+
+  if (material === 'HDPE') {
+    recommendations.push('HDPE gauge sensitive to cooling - balance air ring first');
+  }
+  if (gauge < 1) {
+    recommendations.push('Thin gauge: small die adjustments have large effect');
+  }
+
+  return { targetVariation, dieGapSetting, recommendations };
+}
+
+// Assess bubble stability
+function assessBubbleStability(
+  inputs: OptimizeInputs,
+  bur: number
+): { rating: 'stable' | 'moderate' | 'challenging'; factors: string[]; recommendations: string[] } {
+  const factors: string[] = [];
+  const recommendations: string[] = [];
+  let stabilityScore = 100;
+
+  // BUR effects on stability
+  if (bur > 3.5) {
+    stabilityScore -= 20;
+    factors.push('High BUR increases bubble sensitivity');
+    recommendations.push('Ensure uniform air ring cooling at high BUR');
+  } else if (bur < 2.0) {
+    stabilityScore -= 10;
+    factors.push('Low BUR may cause MD/TD imbalance');
+  }
+
+  // Gauge effects
+  if (inputs.targetGauge < 0.75) {
+    stabilityScore -= 25;
+    factors.push('Very thin gauge highly sensitive to disturbances');
+    recommendations.push('Minimize drafts and air currents around tower');
+    recommendations.push('Consider bubble cage or guide system');
+  } else if (inputs.targetGauge < 1.5) {
+    stabilityScore -= 10;
+    factors.push('Thin gauge moderately sensitive');
+  }
+
+  // Production rate effects
+  if (inputs.productionRate > 400) {
+    stabilityScore -= 15;
+    factors.push('High output rate can challenge stability');
+    recommendations.push('Verify adequate cooling capacity');
+  }
+
+  // Material effects
+  if (inputs.material === 'LLDPE') {
+    stabilityScore -= 5;
+    factors.push('LLDPE has higher melt strength - generally stable');
+  } else if (inputs.material === 'LDPE') {
+    factors.push('LDPE excellent bubble stability');
+  } else if (inputs.material === 'HDPE') {
+    stabilityScore -= 10;
+    factors.push('HDPE lower melt strength - monitor closely');
+    recommendations.push('Maintain consistent melt temperature');
+  } else if (inputs.material === 'EVOH') {
+    stabilityScore -= 15;
+    factors.push('EVOH narrow processing window affects stability');
+    recommendations.push('Precise temperature control essential');
+  }
+
+  // Large diameter effects
+  if (inputs.targetOD > 40) {
+    stabilityScore -= 10;
+    factors.push('Large bubble diameter more prone to oscillation');
+    recommendations.push('Consider IBC for improved stability');
+  }
+
+  // Always add baseline recommendations
+  recommendations.push('Maintain steady extruder output (consistent melt pressure)');
+
+  let rating: 'stable' | 'moderate' | 'challenging';
+  if (stabilityScore >= 75) {
+    rating = 'stable';
+  } else if (stabilityScore >= 50) {
+    rating = 'moderate';
+  } else {
+    rating = 'challenging';
+  }
+
+  return { rating, factors, recommendations };
 }
 
 // Assess confidence in recommendations
@@ -255,6 +460,7 @@ function identifyCriticalParameters(inputs: OptimizeInputs): string[] {
 
   // Always critical
   critical.push('Die gap uniformity for gauge control');
+  critical.push('Frost line height consistency');
 
   return critical;
 }
@@ -283,6 +489,13 @@ export function optimizeParameters(inputs: OptimizeInputs): RecommendedSettings 
   const airRing = calculateAirRing(inputs.productionRate, inputs.material, inputs.targetOD);
   const blowUpRatio = calculateBUR(inputs.targetOD, inputs.material);
 
+  // New calculations
+  const frostLine = calculateFrostLine(inputs.targetOD, inputs.material, inputs.productionRate);
+  const nipRollers = calculateNipRollers(lineSpeed, inputs.targetGauge, inputs.material);
+  const ibc = calculateIBC(inputs.productionRate, inputs.targetOD, inputs.targetGauge, inputs.material);
+  const gaugeControl = calculateGaugeControl(inputs.targetGauge, inputs.targetOD, inputs.material);
+  const bubbleStability = assessBubbleStability(inputs, blowUpRatio);
+
   const confidenceResult = assessConfidence(inputs);
   const criticalParams = identifyCriticalParameters(inputs);
 
@@ -303,6 +516,11 @@ export function optimizeParameters(inputs: OptimizeInputs): RecommendedSettings 
     meltPressure,
     airRing,
     blowUpRatio,
+    frostLine,
+    nipRollers,
+    ibc,
+    gaugeControl,
+    bubbleStability,
     confidence: confidenceResult.level,
     notes,
     criticalParameters: criticalParams,
